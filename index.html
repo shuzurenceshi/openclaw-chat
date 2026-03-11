@@ -436,13 +436,170 @@
             color: white;
         }
         
+        /* 移动端优化 */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            padding: 10px;
+            z-index: 999;
+        }
+        
+        .mobile-nav-items {
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        .mobile-nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            color: #666;
+            transition: color 0.3s;
+        }
+        
+        .mobile-nav-item.active {
+            color: #667eea;
+        }
+        
+        .mobile-nav-item-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .mobile-nav-item-text {
+            font-size: 12px;
+        }
+        
+        /* 移动端侧边栏 */
+        .mobile-sidebar {
+            display: none;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            bottom: 60px;
+            background: white;
+            z-index: 998;
+            transform: translateX(-100%);
+            transition: transform 0.3s;
+        }
+        
+        .mobile-sidebar.show {
+            transform: translateX(0);
+        }
+        
         /* 响应式 */
         @media (max-width: 768px) {
+            .navbar {
+                padding: 10px 15px;
+            }
+            
+            .navbar-nav {
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .mobile-nav {
+                display: block;
+            }
+            
             .sidebar {
                 display: none;
             }
-            .navbar-nav {
-                display: none;
+            
+            .mobile-sidebar {
+                display: block;
+            }
+            
+            .main-container {
+                height: calc(100vh - 120px);
+                margin-bottom: 60px;
+            }
+            
+            .chat-area {
+                width: 100%;
+            }
+            
+            .bubble {
+                max-width: 85%;
+                font-size: 15px;
+            }
+            
+            .input-area textarea {
+                font-size: 16px; /* 防止iOS自动缩放 */
+            }
+            
+            .pricing-cards {
+                grid-template-columns: 1fr;
+                padding: 0 15px;
+            }
+            
+            .pricing-card {
+                padding: 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .data-table {
+                font-size: 12px;
+            }
+            
+            .data-table th, .data-table td {
+                padding: 8px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .navbar-brand {
+                font-size: 18px;
+            }
+            
+            .chat-header h3 {
+                font-size: 16px;
+            }
+            
+            .message {
+                gap: 8px;
+            }
+            
+            .avatar {
+                width: 35px;
+                height: 35px;
+                font-size: 18px;
+            }
+            
+            .bubble {
+                max-width: 90%;
+                padding: 12px 15px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -461,7 +618,48 @@
             <a class="nav-link" onclick="showSettings()">⚙️ 设置</a>
             <a class="nav-link" onclick="logout()">🚪 退出</a>
         </div>
+        <button class="mobile-menu-btn" onclick="toggleMobileSidebar()">☰</button>
     </nav>
+    
+    <!-- 移动端侧边栏 -->
+    <div class="mobile-sidebar" id="mobileSidebar">
+        <div style="padding: 20px; border-bottom: 1px solid #e0e0e0;">
+            <div class="usage-info">
+                <div><strong>今日已用</strong></div>
+                <div style="margin-top: 5px;">
+                    <span id="usageCountMobile">0</span> / <span id="maxUsageMobile">10</span> 次
+                </div>
+                <div class="usage-bar">
+                    <div class="usage-fill" id="usageBarMobile" style="width: 0%"></div>
+                </div>
+            </div>
+            <button class="upgrade-btn" onclick="showPage('pricing'); closeMobileSidebar();">⭐ 升级套餐</button>
+        </div>
+        <div class="conversation-list" id="conversationListMobile"></div>
+        <button class="new-chat-btn" onclick="newConversation(); closeMobileSidebar();">➕ 新对话</button>
+    </div>
+    
+    <!-- 移动端底部导航 -->
+    <div class="mobile-nav">
+        <div class="mobile-nav-items">
+            <div class="mobile-nav-item active" onclick="showPage('chat'); closeMobileSidebar();">
+                <div class="mobile-nav-item-icon">💬</div>
+                <div class="mobile-nav-item-text">对话</div>
+            </div>
+            <div class="mobile-nav-item" onclick="showPage('pricing'); closeMobileSidebar();">
+                <div class="mobile-nav-item-icon">💎</div>
+                <div class="mobile-nav-item-text">套餐</div>
+            </div>
+            <div class="mobile-nav-item" onclick="showPage('admin'); closeMobileSidebar();">
+                <div class="mobile-nav-item-icon">📊</div>
+                <div class="mobile-nav-item-text">后台</div>
+            </div>
+            <div class="mobile-nav-item" onclick="showSettings(); closeMobileSidebar();">
+                <div class="mobile-nav-item-icon">⚙️</div>
+                <div class="mobile-nav-item-text">设置</div>
+            </div>
+        </div>
+    </div>
     
     <!-- 主容器 -->
     <div class="main-container" id="chatPage">
@@ -651,10 +849,29 @@
         let currentConversationId = null;
         let messages = [];
         
+        // ===== 移动端功能 =====
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('mobileSidebar');
+            sidebar.classList.toggle('show');
+        }
+        
+        function closeMobileSidebar() {
+            const sidebar = document.getElementById('mobileSidebar');
+            sidebar.classList.remove('show');
+        }
+        
         // ===== 页面切换 =====
         function showPage(page) {
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-            event.target.classList.add('active');
+            if (event && event.target) event.target.classList.add('active');
+            
+            // 移动端导航高亮
+            document.querySelectorAll('.mobile-nav-item').forEach(item => item.classList.remove('active'));
+            const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
+            const pageIndex = { 'chat': 0, 'pricing': 1, 'admin': 2 };
+            if (mobileNavItems[pageIndex[page]]) {
+                mobileNavItems[pageIndex[page]].classList.add('active');
+            }
             
             document.getElementById('chatPage').style.display = page === 'chat' ? 'flex' : 'none';
             document.getElementById('pricingPage').style.display = page === 'pricing' ? 'block' : 'none';
